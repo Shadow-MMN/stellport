@@ -1,15 +1,15 @@
 import { formatAmount, flattenAssetCode } from '../lib/stellar'
 
 function amountLabel(record) {
-  if (record.type === 'payment') {
-    const asset = flattenAssetCode(record.asset)
+  if (record.type === 'payment' || record.type === 'path_payment_strict_receive' || record.type === 'path_payment_strict_send') {
+    const asset = flattenAssetCode(record)
     return `${formatAmount(record.amount)} ${asset.code}`
   }
   if (record.type === 'create_account') {
     return `Account created with ${formatAmount(record.starting_balance)} XLM`
   }
-  if (record.type === 'path_payment_strict_receive' || record.type === 'path_payment_strict_send') {
-    return `${formatAmount(record.amount)} ${flattenAssetCode(record.asset).code}`
+  if (record.type === 'account_merge') {
+    return `Account merged (${formatAmount(record.amount)} XLM)`
   }
   return record.type ?? 'operation'
 }

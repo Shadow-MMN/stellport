@@ -65,16 +65,16 @@ export async function getCurrentNetwork() {
   }
 }
 
-export function flattenAssetCode(balance) {
-  if (balance.asset_type === 'native') {
-    return { code: 'XLM', isNative: true }
-  }
-  if (balance.asset_type === 'liquidity_pool_shares') {
+export function flattenAssetCode(record) {
+  const type = record?.asset_type
+  if (!type) return { code: '—', isNative: false }
+  if (type === 'native') return { code: 'XLM', isNative: true }
+  if (type === 'liquidity_pool_shares') {
     return { code: 'LP Shares', isNative: false }
   }
   return {
-    code: balance.asset_code ?? '?',
-    issuer: balance.asset_issuer,
+    code: record.asset_code ?? '?',
+    issuer: record.asset_issuer,
     isNative: false,
   }
 }

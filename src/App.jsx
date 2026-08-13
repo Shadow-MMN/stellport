@@ -5,6 +5,7 @@ import PortfolioCard from './components/PortfolioCard'
 import SendCard from './components/SendCard'
 import RecentPayments from './components/RecentPayments'
 import FaucetCard from './components/FaucetCard'
+import ErrorBoundary from './components/ErrorBoundary'
 import { StatusPill } from './components/StatusPill'
 import {
   EXPLORER_TX_URL,
@@ -159,52 +160,56 @@ function App() {
       </header>
 
       <main className="layout">
-        <div className="layout__main">
-          <WalletCard
-            connected={Boolean(address)}
-            address={address}
-            onConnect={connect}
-            onDisconnect={disconnect}
-            busy={connectBusy}
-            installHint={installHint}
-          />
+        <ErrorBoundary>
+          <div className="layout__main">
+            <WalletCard
+              connected={Boolean(address)}
+              address={address}
+              onConnect={connect}
+              onDisconnect={disconnect}
+              busy={connectBusy}
+              installHint={installHint}
+            />
 
-          {address && !isFunded && (
-            <FaucetCard address={address} onFunded={() => refresh()} />
-          )}
+            {address && !isFunded && (
+              <FaucetCard address={address} onFunded={() => refresh()} />
+            )}
 
-          {error && <p className="error error--box">{error}</p>}
+            {error && <p className="error error--box">{error}</p>}
+
+            {address && (
+              <>
+                <PortfolioCard
+                  balances={balances}
+                  onRefresh={refresh}
+                  busy={loading}
+                />
+                <SendCard onSend={handleSend} disabled={!isFunded} />
+              </>
+            )}
+          </div>
 
           {address && (
-            <>
-              <PortfolioCard
-                balances={balances}
-                onRefresh={refresh}
-                busy={loading}
-              />
-              <SendCard onSend={handleSend} disabled={!isFunded} />
-            </>
+            <aside className="layout__side">
+              <ErrorBoundary>
+                <RecentPayments address={address} payments={payments} />
+              </ErrorBoundary>
+              <section className="card">
+                <div className="card__head">
+                  <h2>Network info</h2>
+                </div>
+                <dl className="kv">
+                  <dt>Horizon</dt>
+                  <dd className="mono">horizon-testnet.stellar.org</dd>
+                  <dt>Passphrase</dt>
+                  <dd className="mono break">{network.networkPassphrase || '—'}</dd>
+                  <dt>Explorer</dt>
+                  <dd className="mono break">{EXPLORER_TX_URL.replace(/tx\/$/, '')}</dd>
+                </dl>
+              </section>
+            </aside>
           )}
-        </div>
-
-        {address && (
-          <aside className="layout__side">
-            <section className="card">
-              <div className="card__head">
-                <h2>Network info</h2>
-              </div>
-              <dl className="kv">
-                <dt>Horizon</dt>
-                <dd className="mono">horizon-testnet.stellar.org</dd>
-                <dt>Passphrase</dt>
-                <dd className="mono break">{network.networkPassphrase || '—'}</dd>
-                <dt>Explorer</dt>
-                <dd className="mono break">{EXPLORER_TX_URL.replace(/tx\/$/, '')}</dd>
-              </dl>
-            </section>
-            <RecentPayments address={address} payments={payments} />
-          </aside>
-        )}
+        </ErrorBoundary>
       </main>
 
       <footer className="footer">
