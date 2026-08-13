@@ -153,7 +153,7 @@ function App() {
           <span>StellPort</span>
         </div>
         <div className="row">
-          <StatusPill tone={onTestnet ? 'success' : 'warn'}>
+          <StatusPill tone={onTestnet ? 'warn' : 'muted'}>
             {onTestnet ? 'Stellar Testnet' : network.network || 'Unknown network'}
           </StatusPill>
         </div>
