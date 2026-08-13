@@ -73,10 +73,10 @@ and fund it with `curl "https://friendbot.stellar.org?addr=<ADDRESS>"`.
 
 ## Screenshots
 
-> Replace the placeholder SVGs in [`/screenshots`](./screenshots) with real captures
-> (Command/Ctrl+Shift+S in your browser) before submitting.
+> Replace the remaining placeholder SVGs in [`/screenshots`](./screenshots) with real
+> captures (Command/Ctrl+Shift+S in your browser) before submitting.
 
-![Wallet connected](screenshots/1-wallet-connected.svg)
+![Wallet connected](screenshots/1-wallet-connected.png)
 
 ![Balance displayed](screenshots/2-balance.svg)
 
