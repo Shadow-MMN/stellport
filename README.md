@@ -1,5 +1,11 @@
 # StellPort
 
+![React 19](https://img.shields.io/badge/React-19-ffd83d?style=flat-square&labelColor=0a0a0d)
+![Vite 8](https://img.shields.io/badge/Vite-8-ffd83d?style=flat-square&labelColor=0a0a0d)
+![Stellar Testnet](https://img.shields.io/badge/Stellar-Testnet-ffd83d?style=flat-square&labelColor=0a0a0d)
+![@stellar/stellar-sdk v16](https://img.shields.io/badge/stellar--sdk-v16-ffd83d?style=flat-square&labelColor=0a0a0d)
+![Freighter Wallet](https://img.shields.io/badge/Freighter-Wallet-ffd83d?style=flat-square&labelColor=0a0a0d)
+
 A **Stellar Testnet Wallet & Portfolio** dApp built for **Level 1 — White Belt** of the
 [Stellar Journey to Mastery](https://www.risein.com/programs/stellar-journey-to-mastery-monthly-builder-challenges)
 (Rise In × Stellar Development Foundation).
@@ -9,6 +15,10 @@ StellPort is the first slice of a larger portfolio dashboard vision for Stellar
 ecosystem research). This level ships its foundation: a wallet that connects to Freighter,
 reads an account's live XLM/asset balances, and sends testnet XLM with full transaction
 feedback.
+
+![StellPort dashboard](screenshots/every-operation.png)
+
+---
 
 ## Features
 
@@ -21,16 +31,43 @@ feedback.
 - **Recent operations** history and **network info** panel
 - Auto-refresh when the account or network changes (Freighter `WatchWalletChanges`)
 
+## Level 1 — White Belt coverage
+
+| Requirement                                                                            | Where it lives                                                | Evidence                                                                 |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **Freighter wallet + Stellar Testnet**                                                 | README prereqs + in-app install prompt                        | [Dashboard](screenshots/every-operation.png)                              |
+| **Connect / disconnect wallet**                                                        | [`WalletCard.jsx`](src/components/WalletCard.jsx)              | [Dashboard](screenshots/every-operation.png)                              |
+| **Fetch XLM balance & display in UI**                                                  | [`PortfolioCard.jsx`](src/components/PortfolioCard.jsx)        | [Balance](screenshots/2-balance.png)                                      |
+| **Send an XLM transaction on testnet**                                                 | [`SendCard.jsx`](src/components/SendCard.jsx) + [`lib/stellar.js`](src/lib/stellar.js) | [On-chain tx](screenshots/3-successful-transaction.png)                   |
+| **Success / failure + transaction hash shown**                                         | [`SendCard.jsx`](src/components/SendCard.jsx)                  | Result box in dashboard (hash + "View on Explorer")                       |
+| **10+ meaningful commits**                                                             | Repo history (12 commits)                                      | [`git log`](https://github.com/Shadow-MMN/stellport/commits/main)         |
+
+## Screenshots
+
+### 1 · Wallet connected — full dashboard
+
+![Wallet connected](screenshots/every-operation.png)
+
+### 2 · Balance displayed
+
+![Balance displayed](screenshots/2-balance.png)
+
+### 3 · Successful testnet transaction (on-chain on Stellar Expert)
+
+![Successful testnet transaction](screenshots/3-successful-transaction.png)
+
+---
+
 ## What's under the hood
 
-| Piece | Tech |
-| --- | --- |
-| App shell | React 19 + Vite |
-| Stellar SDK | `@stellar/stellar-sdk` v16 (Horizon, testnet) |
-| Wallet | `@stellar/freighter-api` v6 (`requestAccess`, `getAddress`, `signTransaction`) |
-| Network | Stellar **Testnet** (`https://horizon-testnet.stellar.org`) |
-| Faucet | Stellar Friendbot (`https://friendbot.stellar.org`) |
-| Explorer | [Stellar Expert — Testnet](https://stellar.expert/explorer/testnet/) |
+| Piece       | Tech                                                                           |
+| ----------- | ------------------------------------------------------------------------------ |
+| App shell   | React 19 + Vite                                                                |
+| Stellar SDK | `@stellar/stellar-sdk` v16 (Horizon, testnet)                                  |
+| Wallet      | `@stellar/freighter-api` v6 (`requestAccess`, `getAddress`, `signTransaction`) |
+| Network     | Stellar **Testnet** (`https://horizon-testnet.stellar.org`)                    |
+| Faucet      | Stellar Friendbot (`https://friendbot.stellar.org`)                            |
+| Explorer    | [Stellar Expert — Testnet](https://stellar.expert/explorer/testnet/)           |
 
 ## Prerequisites
 
@@ -71,39 +108,20 @@ You can also grab a random funded testnet address to send to:
 run `node -e "console.log(require('@stellar/stellar-sdk').Keypair.random().publicKey())"`
 and fund it with `curl "https://friendbot.stellar.org?addr=<ADDRESS>"`.
 
-## Screenshots
-
-> Replace the remaining placeholder SVGs in [`/screenshots`](./screenshots) with real
-> captures (Command/Ctrl+Shift+S in your browser) before submitting.
-
-![Wallet connected](screenshots/1-wallet-connected.png)
-
-![Balance displayed](screenshots/2-balance.svg)
-
-![Successful testnet transaction](screenshots/3-successful-transaction.svg)
-
-![Transaction result shown to the user](screenshots/4-transaction-feedback.svg)
-
-### How the required states look
-
-1. **Wallet connected** — the Wallet card shows the green *Connected* pill, your address, and a Disconnect button.
-2. **Balance displayed** — the Portfolio card shows the big XLM amount (and any other assets).
-3. **Successful testnet transaction** — the Send card result box turns green with **Transaction succeeded**, the hash, and the explorer link.
-4. **Transaction result shown** — the result box always renders a state (pending / success / failure), so the user always knows what happened.
-
 ## Project layout
 
 ```
 src/
-  App.jsx                 # App shell, state, Freighter change-watcher, data loading
-  lib/stellar.js          # All Stellar logic: connect, balances, send, faucet, explorer links
+  App.jsx                    # App shell, state, Freighter change-watcher, data loading
+  lib/stellar.js             # All Stellar logic: connect, balances, send, faucet, explorer links
   components/
-    WalletCard.jsx        # Connect / disconnect + install prompt
-    PortfolioCard.jsx     # XLM + asset balances, refresh
-    SendCard.jsx          # Send XLM form + success/failure/hash feedback
-    FaucetCard.jsx        # Friendbot one-click funding
-    RecentPayments.jsx    # Recent operations for the account
-    StatusPill.jsx        # Tiny shared badges / copy button
+    WalletCard.jsx           # Connect / disconnect + install prompt
+    PortfolioCard.jsx        # XLM + asset balances, refresh
+    SendCard.jsx             # Send XLM form + success/failure/hash feedback
+    FaucetCard.jsx           # Friendbot one-click funding
+    RecentPayments.jsx       # Recent operations for the account
+    ErrorBoundary.jsx        # Renders errors instead of a blank screen
+    StatusPill.jsx           # Tiny shared badges / copy button
 ```
 
 ## Verification
@@ -112,7 +130,8 @@ src/
 - `npm run build` — production build
 - `npm run lint` — oxlint
 
-All functionality was verified against the live testnet (Friendbot funding → balance read → signed payment → `transaction successful: true` + hash).
+All functionality was verified against the live testnet
+(Friendbot funding → balance read → signed payment → `transaction successful: true` + hash).
 
 ## Roadmap
 
