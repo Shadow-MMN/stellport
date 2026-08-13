@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070b14"/>
+      <stop offset="1" stop-color="#101a30"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="360" rx="18" fill="url(#bg)"/>
+  <circle cx="120" cy="320" r="170" fill="#22d3a5" opacity="0.08"/>
+  <text x="80" y="90" fill="#8ea0c3" font-family="sans-serif" font-size="13" letter-spacing="1" text-transform="uppercase">Portfolio · Balance</text>
+  <text x="80" y="160" fill="#e6ecff" font-family="sans-serif" font-size="64" font-weight="800">9,999.99</text>
+  <text x="300" y="158" fill="#8ea0c3" font-family="sans-serif" font-size="22" font-weight="600">XLM</text>
+  <rect x="80" y="200" width="560" height="1" fill="#22304f"/>
+  <text x="80" y="248" fill="#8ea0c3" font-family="monospace" font-size="14">USDC G…1234 12.00</text>
+  <text x="80" y="282" fill="#8ea0c3" font-family="monospace" font-size="14">EURC G…5678 3.50</text>
+  <text x="80" y="340" fill="#8ea0c3" font-family="sans-serif" font-size="13" font-style="italic">Replace this placeholder with your Screenshot 2</text>
+</svg>
