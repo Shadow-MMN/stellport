@@ -1,7 +1,7 @@
-import { isFreighterInstalled, truncatePublicKey } from '../lib/stellar'
+import { truncatePublicKey } from '../lib/stellar'
 import { CopyButton, StatusPill } from './StatusPill'
 
-function WalletCard({ connected, address, onConnect, onDisconnect, busy }) {
+function WalletCard({ connected, address, onConnect, onDisconnect, busy, installHint }) {
   return (
     <section className="card">
       <div className="card__head">
@@ -23,21 +23,20 @@ function WalletCard({ connected, address, onConnect, onDisconnect, busy }) {
             >
               {busy ? 'Connecting…' : 'Connect Freighter'}
             </button>
-            {!isFreighterInstalled() && (
-              <a
-                href="https://www.freighter.app/"
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn--ghost"
-              >
-                Install Freighter
-              </a>
-            )}
+            <a
+              href="https://www.freighter.app/"
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn--ghost"
+            >
+              Install Freighter
+            </a>
           </div>
-          {!isFreighterInstalled() && (
+          {installHint && (
             <p className="hint">
-              Freighter does not look installed. Install the browser extension,
-              create a wallet and switch it to the testnet before continuing.
+              StellPort could not reach Freighter. Click the Freighter icon in the
+              browser toolbar once to wake it up (make sure it's unlocked and on the
+              Testnet network), then connect again.
             </p>
           )}
         </>

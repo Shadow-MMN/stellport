@@ -24,8 +24,13 @@ export const EXPLORER_TX_URL = 'https://stellar.expert/explorer/testnet/tx/'
 
 export const server = new Horizon.Server(HORIZON_URL)
 
-export function isFreighterInstalled() {
-  return typeof window !== 'undefined' && Boolean(window.freighter)
+export function callWithTimeout(promise, ms, message) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(message)), ms),
+    ),
+  ])
 }
 
 export async function getWalletState() {
@@ -38,7 +43,11 @@ export async function getWalletState() {
 }
 
 export async function requestWalletAccess() {
-  const res = await requestAccess()
+  const res = await callWithTimeout(
+    requestAccess(),
+    12000,
+    'Freighter did not respond. Click the Freighter icon in the toolbar once, then try again.',
+  )
   return { address: res?.address ?? '', error: res?.error ?? null }
 }
 

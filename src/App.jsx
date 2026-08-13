@@ -12,7 +12,6 @@ import {
   fetchAccountBalances,
   fetchRecentPayments,
   getCurrentNetwork,
-  isFreighterInstalled,
   requestWalletAccess,
   sendXlm,
 } from './lib/stellar'
@@ -25,6 +24,7 @@ function App() {
   const [connectBusy, setConnectBusy] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [installHint, setInstallHint] = useState(false)
   const watcherRef = useRef(null)
 
   const loadAccountData = useCallback(async (publicKey) => {
@@ -59,19 +59,28 @@ function App() {
     setConnectBusy(true)
     setError('')
     try {
-      if (!isFreighterInstalled()) {
+      const res = await requestWalletAccess()
+      if (res.error) {
         throw new Error(
-          'Freighter is not installed. Install the extension, create a wallet and switch it to Testnet.',
+          typeof res.error === 'string'
+            ? res.error
+            : res.error?.message ?? 'Could not connect to Freighter.',
         )
       }
-      const res = await requestWalletAccess()
-      if (res.error) throw new Error(res.error.message ?? res.error)
+      if (!res.address) {
+        throw new Error('Freighter did not return an address. Try again.')
+      }
+      setInstallHint(false)
       localStorage.setItem('stellport', res.address)
       setAddress(res.address)
       await syncNetwork()
       await loadAccountData(res.address)
     } catch (err) {
-      setError(err?.message ?? 'Could not connect to Freighter.')
+      const message = err?.message ?? 'Could not connect to Freighter.'
+      setError(message)
+      if (/freighter|did not respond|extension/i.test(message)) {
+        setInstallHint(true)
+      }
     } finally {
       setConnectBusy(false)
     }
@@ -83,6 +92,7 @@ function App() {
     setBalances([])
     setPayments([])
     setError('')
+    setInstallHint(false)
   }
 
   const refresh = useCallback(async () => {
@@ -156,6 +166,7 @@ function App() {
             onConnect={connect}
             onDisconnect={disconnect}
             busy={connectBusy}
+            installHint={installHint}
           />
 
           {address && !isFunded && (
