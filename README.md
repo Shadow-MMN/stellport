@@ -16,8 +16,6 @@ ecosystem research). This level ships its foundation: a wallet that connects to 
 reads an account's live XLM/asset balances, and sends testnet XLM with full transaction
 feedback.
 
-![StellPort dashboard](screenshots/every-operation.png)
-
 ---
 
 ## Features
@@ -37,16 +35,19 @@ feedback.
 | -------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | **Freighter wallet + Stellar Testnet**                                                 | README prereqs + in-app install prompt                        | [Dashboard](screenshots/every-operation.png)                              |
 | **Connect / disconnect wallet**                                                        | [`WalletCard.jsx`](src/components/WalletCard.jsx)              | [Dashboard](screenshots/every-operation.png)                              |
-| **Fetch XLM balance & display in UI**                                                  | [`PortfolioCard.jsx`](src/components/PortfolioCard.jsx)        | [Balance](screenshots/2-balance.png)                                      |
+| **Fetch XLM balance & display in UI**                                                  | [`PortfolioCard.jsx`](src/components/PortfolioCard.jsx)        | [Dashboard](screenshots/every-operation.png) + [Balance](screenshots/2-balance.png) |
 | **Send an XLM transaction on testnet**                                                 | [`SendCard.jsx`](src/components/SendCard.jsx) + [`lib/stellar.js`](src/lib/stellar.js) | [On-chain tx](screenshots/3-successful-transaction.png)                   |
-| **Success / failure + transaction hash shown**                                         | [`SendCard.jsx`](src/components/SendCard.jsx)                  | Result box in dashboard (hash + "View on Explorer")                       |
+| **Success / failure + transaction hash shown**                                         | [`SendCard.jsx`](src/components/SendCard.jsx)                  | [Dashboard](screenshots/every-operation.png) (result box + "View on Explorer") |
 | **10+ meaningful commits**                                                             | Repo history (12 commits)                                      | [`git log`](https://github.com/Shadow-MMN/stellport/commits/main)         |
 
 ## Screenshots
 
-### 1 · Wallet connected — full dashboard
+### 1 · Full dashboard — wallet connected, balance & transaction result shown
 
-![Wallet connected](screenshots/every-operation.png)
+This single full-page capture of the app shows the connected wallet, the XLM balance,
+and the transaction result (with hash + explorer link) together.
+
+![Full dashboard](screenshots/every-operation.png)
 
 ### 2 · Balance displayed
 
