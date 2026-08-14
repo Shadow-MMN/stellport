@@ -97,10 +97,14 @@ fn test_remove_position() {
         &String::from_str(&env, "b"),
     );
 
-    // Remove the first position.
+    // get_positions is newest-first, so index 0 is the newest position (USDC).
+    let positions = client.get_positions();
+    assert_eq!(positions.get(0).unwrap().asset, Symbol::new(&env, "USDC"));
+
+    // Remove the newest position (display index 0).
     assert!(client.remove_position(&alice, &0));
     assert_eq!(client.get_count(), 1);
-    assert_eq!(client.get_total(), 500);
+    assert_eq!(client.get_total(), 1000);
 
     // Non-existent index -> false.
     assert!(!client.remove_position(&alice, &5));
@@ -124,6 +128,50 @@ fn test_remove_position_requires_owner() {
     // mallory is not the owner -> error.
     let result = client.try_remove_position(&mallory, &0);
     assert!(result.is_err());
+}
+
+#[test]
+fn test_remove_position_uses_display_index() {
+    let env = Env::default();
+    let (client, _) = create_contract(&env);
+    let client = client.mock_all_auths();
+    let alice = Address::generate(&env);
+    let bob = Address::generate(&env);
+
+    // alice adds two positions, then bob adds one (newest, display index 0).
+    client.add_position(
+        &alice,
+        &Symbol::new(&env, "XLM"),
+        &1000i128,
+        &String::from_str(&env, "a"),
+    );
+    client.add_position(
+        &alice,
+        &Symbol::new(&env, "USDC"),
+        &500i128,
+        &String::from_str(&env, "b"),
+    );
+    client.add_position(
+        &bob,
+        &Symbol::new(&env, "ETH"),
+        &250i128,
+        &String::from_str(&env, "c"),
+    );
+
+    let positions = client.get_positions();
+    assert_eq!(positions.get(0).unwrap().asset, Symbol::new(&env, "ETH"));
+    assert_eq!(positions.get(2).unwrap().asset, Symbol::new(&env, "XLM"));
+
+    // bob removes his own position at display index 0.
+    assert!(client.remove_position(&bob, &0));
+    assert_eq!(client.get_count(), 2);
+    assert_eq!(client.get_total(), 1500);
+
+    // After removal the display order is [USDC, XLM]. Display index 1 is
+    // alice's XLM position; alice removes it.
+    assert!(client.remove_position(&alice, &1));
+    assert_eq!(client.get_count(), 1);
+    assert_eq!(client.get_total(), 500);
 }
 
 #[test]

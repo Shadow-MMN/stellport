@@ -84,8 +84,10 @@ impl Contract {
         count
     }
 
-    /// Removes a position by index. Only the owner of that position may remove
-    /// it. Emits a `PositionRemoved` event for real-time sync.
+    /// Removes a position by index. The index refers to the display order
+    /// returned by `get_positions` (newest first), so index 0 is the newest
+    /// position. Only the owner of that position may remove it. Emits a
+    /// `PositionRemoved` event for real-time sync.
     pub fn remove_position(env: Env, owner: Address, index: u32) -> bool {
         owner.require_auth();
 
@@ -95,7 +97,15 @@ impl Contract {
             .get(&storage_key(&env, "positions"))
             .unwrap_or_else(|| vec![&env]);
 
-        let Some(position) = positions.get(index) else {
+        // Map the display index (newest first, from get_positions) back to the
+        // storage index (oldest first).
+        let len = positions.len();
+        if index >= len {
+            return false;
+        }
+        let storage_index = len - 1 - index;
+
+        let Some(position) = positions.get(storage_index) else {
             return false;
         };
 
@@ -104,9 +114,9 @@ impl Contract {
         }
 
         let removed = positions
-            .get(index)
+            .get(storage_index)
             .expect("position exists (checked above)");
-        positions.remove_unchecked(index);
+        positions.remove_unchecked(storage_index);
         env.storage().instance().set(&storage_key(&env, "positions"), &positions);
 
         let count: u32 = env
