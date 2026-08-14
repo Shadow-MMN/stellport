@@ -1,21 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { WatchWalletChanges } from '@stellar/freighter-api'
+import { useCallback, useEffect, useState } from 'react'
 import WalletCard from './components/WalletCard'
 import PortfolioCard from './components/PortfolioCard'
 import SendCard from './components/SendCard'
 import RecentPayments from './components/RecentPayments'
 import FaucetCard from './components/FaucetCard'
+import PositionsBoard from './components/PositionsBoard'
 import ErrorBoundary from './components/ErrorBoundary'
 import { StatusPill } from './components/StatusPill'
 import {
   EXPLORER_TX_URL,
   NETWORK,
+  disconnectFromWallet,
   fetchAccountBalances,
   fetchRecentPayments,
   getCurrentNetwork,
   requestWalletAccess,
   sendXlm,
 } from './lib/stellar'
+import { watchWalletChanges } from './lib/wallet'
 
 function App() {
   const [address, setAddress] = useState('')
@@ -26,7 +28,6 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [installHint, setInstallHint] = useState(false)
-  const watcherRef = useRef(null)
 
   const loadAccountData = useCallback(async (publicKey) => {
     setLoading(true)
@@ -62,14 +63,10 @@ function App() {
     try {
       const res = await requestWalletAccess()
       if (res.error) {
-        throw new Error(
-          typeof res.error === 'string'
-            ? res.error
-            : res.error?.message ?? 'Could not connect to Freighter.',
-        )
+        throw new Error(res.error)
       }
       if (!res.address) {
-        throw new Error('Freighter did not return an address. Try again.')
+        throw new Error('No wallet returned an address. Try again.')
       }
       setInstallHint(false)
       localStorage.setItem('stellport', res.address)
@@ -77,9 +74,9 @@ function App() {
       await syncNetwork()
       await loadAccountData(res.address)
     } catch (err) {
-      const message = err?.message ?? 'Could not connect to Freighter.'
+      const message = err?.message ?? 'Could not connect a wallet.'
       setError(message)
-      if (/freighter|did not respond|extension/i.test(message)) {
+      if (/wallet|extension|install|respond/i.test(message)) {
         setInstallHint(true)
       }
     } finally {
@@ -87,8 +84,13 @@ function App() {
     }
   }
 
-  const disconnect = () => {
+  const disconnect = async () => {
     localStorage.removeItem('stellport')
+    try {
+      await disconnectFromWallet()
+    } catch {
+      // ignore; local state is the source of truth here
+    }
     setAddress('')
     setBalances([])
     setPayments([])
@@ -111,22 +113,21 @@ function App() {
 
   useEffect(() => {
     if (!address) return
-    const watcher = new WatchWalletChanges(4000)
-    watcherRef.current = watcher
-    watcher.watch(async (info) => {
-      if (info.address && info.address !== address) {
-        setAddress(info.address)
-        loadAccountData(info.address)
+    const off = watchWalletChanges((payload) => {
+      const nextAddress = payload?.address || payload?.publicKey
+      if (nextAddress && nextAddress !== address) {
+        setAddress(nextAddress)
+        loadAccountData(nextAddress)
         setError('')
       }
-      if (info.networkPassphrase) {
+      if (payload?.networkPassphrase) {
         setNetwork((prev) => ({
           ...prev,
-          networkPassphrase: info.networkPassphrase,
+          networkPassphrase: payload.networkPassphrase,
         }))
       }
     })
-    return () => watcher.cleanup?.()
+    return off
   }, [address, loadAccountData])
 
   const handleSend = async (form) => {
@@ -185,6 +186,9 @@ function App() {
                   busy={loading}
                 />
                 <SendCard onSend={handleSend} disabled={!isFunded} />
+                <ErrorBoundary>
+                  <PositionsBoard address={address} />
+                </ErrorBoundary>
               </>
             )}
           </div>

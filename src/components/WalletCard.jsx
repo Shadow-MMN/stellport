@@ -13,7 +13,9 @@ function WalletCard({ connected, address, onConnect, onDisconnect, busy, install
 
       {!connected ? (
         <>
-          <p className="muted">Connect your Freighter wallet to get started.</p>
+          <p className="muted">
+            Connect any Stellar wallet (Freighter, xBull, Lobstr, Albedo, Rabet…).
+          </p>
           <div className="row">
             <button
               type="button"
@@ -21,7 +23,7 @@ function WalletCard({ connected, address, onConnect, onDisconnect, busy, install
               onClick={onConnect}
               disabled={busy}
             >
-              {busy ? 'Connecting…' : 'Connect Freighter'}
+              {busy ? 'Connecting…' : 'Connect wallet'}
             </button>
             <a
               href="https://www.freighter.app/"
@@ -29,14 +31,14 @@ function WalletCard({ connected, address, onConnect, onDisconnect, busy, install
               rel="noreferrer"
               className="btn btn--ghost"
             >
-              Install Freighter
+              Install a wallet
             </a>
           </div>
           {installHint && (
             <p className="hint">
-              StellPort could not reach Freighter. Click the Freighter icon in the
-              browser toolbar once to wake it up (make sure it's unlocked and on the
-              Testnet network), then connect again.
+              StellPort could not reach a wallet. Open your wallet extension once
+              to wake it up (make sure it's unlocked and on the Testnet network),
+              then connect again.
             </p>
           )}
         </>
