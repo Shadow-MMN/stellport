@@ -9,12 +9,12 @@ import {
   TransactionBuilder,
 } from '@stellar/stellar-sdk'
 import {
-  requestAccess,
-  getAddress,
-  isConnected,
-  getNetwork,
-  signTransaction,
-} from '@stellar/freighter-api'
+  connectWallet,
+  disconnectWallet,
+  getWalletAddress,
+  getWalletNetwork,
+  signWalletTransaction,
+} from './wallet'
 
 export const NETWORK = 'testnet'
 export const NETWORK_PASSPHRASE = Networks.TESTNET
@@ -35,33 +35,45 @@ export function callWithTimeout(promise, ms, message) {
 
 export async function getWalletState() {
   try {
-    const connected = await isConnected()
-    return { connected, ...connected }
+    const address = await getWalletAddress()
+    return { connected: Boolean(address), address }
   } catch (error) {
     return { connected: false, error }
   }
 }
 
 export async function requestWalletAccess() {
-  const res = await callWithTimeout(
-    requestAccess(),
-    12000,
-    'Freighter did not respond. Click the Freighter icon in the toolbar once, then try again.',
-  )
-  return { address: res?.address ?? '', error: res?.error ?? null }
+  try {
+    const address = await callWithTimeout(
+      connectWallet(),
+      12000,
+      'No wallet responded. Open the wallet extension once, then try again.',
+    )
+    return { address, error: null }
+  } catch (error) {
+    return { address: '', error: error.message ?? error }
+  }
+}
+
+export async function disconnectFromWallet() {
+  await disconnectWallet()
 }
 
 export async function getPublicKey() {
-  const res = await getAddress()
-  return { address: res?.address ?? '', error: res?.error ?? null }
+  try {
+    const address = await getWalletAddress()
+    return { address, error: null }
+  } catch (error) {
+    return { address: '', error: error.message ?? error }
+  }
 }
 
 export async function getCurrentNetwork() {
-  const res = await getNetwork()
-  return {
-    network: res?.network ?? '',
-    networkPassphrase: res?.networkPassphrase ?? '',
-    error: res?.error ?? null,
+  try {
+    const { network, networkPassphrase } = await getWalletNetwork()
+    return { network, networkPassphrase, error: null }
+  } catch (error) {
+    return { network: '', networkPassphrase: '', error: error.message ?? error }
   }
 }
 
@@ -140,20 +152,17 @@ export async function sendXlm({ from, to, amount, memo }) {
   }
 
   const xdr = tx.toXDR()
-  const signed = await signTransaction(xdr, {
+  const signed = await signWalletTransaction(xdr, {
     address: from,
     networkPassphrase: NETWORK_PASSPHRASE,
   })
 
-  if (signed?.error) {
-    throw new Error(signed.error.message ?? signed.error)
-  }
-  if (!signed?.signedTxXdr) {
+  if (!signed) {
     throw new Error('Transaction was not signed. It may have been rejected.')
   }
 
   const signedTx = TransactionBuilder.fromXDR(
-    signed.signedTxXdr,
+    signed,
     NETWORK_PASSPHRASE,
   )
 
