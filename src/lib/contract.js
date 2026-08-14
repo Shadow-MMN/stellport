@@ -7,13 +7,13 @@ import {
 import { NETWORK_PASSPHRASE } from './stellar'
 import { signWalletTransaction, classifyWalletError, WalletError } from './wallet'
 
-export const CONTRACT_ID = 'CASERLI2CZ4ZZ2VHK4JZCT27PUF2YHMWBDJZ3DG7OD3EDJCNXFISH3FI'
+export const CONTRACT_ID = 'CBGQVC3NSIERUM6P23WB5RMQBC7QSQ7MTBEDPZVU7PFAD2SDMMEM6YCC'
 export const CONTRACT_RPC_URL = 'https://soroban-testnet.stellar.org'
 export const SOROBAN_EVENT_TOPICS = ['portfolio_tracker', 'position_added', 'position_removed']
 
 const server = new rpc.Server(CONTRACT_RPC_URL, { allowHttp: false })
 
-function getTrackerClient(publicKey, signTransaction) {
+async function getTrackerClient(publicKey, signTransaction) {
   return contract.Client.from({
     contractId: CONTRACT_ID,
     rpcUrl: CONTRACT_RPC_URL,
@@ -24,25 +24,25 @@ function getTrackerClient(publicKey, signTransaction) {
 }
 
 export async function fetchPositions(publicKey, signTransaction = signWalletTransaction) {
-  const client = getTrackerClient(publicKey, signTransaction)
+  const client = await getTrackerClient(publicKey, signTransaction)
   const tx = await client.get_positions()
   return tx.result
 }
 
 export async function fetchCount(publicKey, signTransaction = signWalletTransaction) {
-  const client = getTrackerClient(publicKey, signTransaction)
+  const client = await getTrackerClient(publicKey, signTransaction)
   const tx = await client.get_count()
   return Number(tx.result)
 }
 
 export async function fetchTotal(publicKey, signTransaction = signWalletTransaction) {
-  const client = getTrackerClient(publicKey, signTransaction)
+  const client = await getTrackerClient(publicKey, signTransaction)
   const tx = await client.get_total()
   return String(tx.result)
 }
 
 export async function addPosition({ owner, asset, amount, note }, signTransaction = signWalletTransaction) {
-  const client = getTrackerClient(owner, signTransaction)
+  const client = await getTrackerClient(owner, signTransaction)
   const tx = await client.add_position({ owner, asset, amount: BigInt(amount), note })
   const sent = await tx.signAndSend()
   return {
@@ -53,7 +53,7 @@ export async function addPosition({ owner, asset, amount, note }, signTransactio
 }
 
 export async function removePosition({ owner, index }, signTransaction = signWalletTransaction) {
-  const client = getTrackerClient(owner, signTransaction)
+  const client = await getTrackerClient(owner, signTransaction)
   const tx = await client.remove_position({ owner, index: BigInt(index) })
   const sent = await tx.signAndSend()
   return {

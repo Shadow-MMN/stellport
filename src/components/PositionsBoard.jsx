@@ -88,8 +88,8 @@ function PositionsBoard({ address }) {
         cursor: cursorRef.current ?? undefined,
       })
       if (cursor) cursorRef.current = cursor
+      setLive(true)
       if (events.length > 0) {
-        setLive(true)
         await load()
       }
     } catch (err) {
