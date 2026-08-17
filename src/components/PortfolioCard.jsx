@@ -2,10 +2,10 @@ import {
   formatAmount,
   flattenAssetCode,
 } from '../lib/stellar'
+import { portfolioSummary } from '../lib/portfolio'
 
 function PortfolioCard({ balances, onRefresh, busy }) {
-  const nativeBalance =
-    balances.find((b) => b.asset_type === 'native')?.balance ?? '0'
+  const { native: nativeBalance, assets } = portfolioSummary(balances)
   const others = balances.filter((b) => b.asset_type !== 'native')
 
   return (
@@ -62,6 +62,9 @@ function PortfolioCard({ balances, onRefresh, busy }) {
           Only XLM so far — fund your account with the faucet button below.
         </p>
       )}
+      <p className="card__updated" aria-live="polite">
+        {assets.length} non-native asset{assets.length === 1 ? '' : 's'} indexed from Horizon
+      </p>
     </section>
   )
 }

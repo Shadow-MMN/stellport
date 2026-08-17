@@ -176,7 +176,7 @@ src/
 contracts/
   portfolio-tracker/         # Soroban contract workspace (soroban-sdk 27)
     contracts/portfolio_tracker/src/lib.rs   # Contract + events
-    contracts/portfolio_tracker/src/test.rs  # 8 unit tests
+    contracts/portfolio_tracker/src/test.rs  # 9 unit tests
 ```
 
 ## Verification
@@ -184,7 +184,7 @@ contracts/
 - `npm run dev` — run locally
 - `npm run build` — production build
 - `npm run lint` — oxlint
-- `cargo test --release` (in `contracts/portfolio-tracker`) — 8 contract tests
+- `cargo test --release` (in `contracts/portfolio-tracker`) — 9 contract tests
 
 All functionality was verified against the live testnet:
 Friendbot funding → balance read → signed payment (`transaction successful: true`) →
@@ -197,3 +197,51 @@ StellPort keeps growing toward the full **Stellar portfolio & DeFi dashboard** d
 our ecosystem research (liquidity pools, yield strategies, valuations). Level 2 delivered
 multi-wallet support and a live Soroban positions board; future levels will add more
 contracts, richer position tracking, and DeFi integrations.
+
+## Level 3 — Advanced Smart Contracts + Production-Ready dApp
+
+StellPort's Level 3 implementation is included in this repository. The app is
+still intentionally configured for Stellar testnet while the production
+workflow is validated.
+
+### Completed requirements
+
+- **Advanced contract logic:** `sync_position` reads a live position from an
+  external Soroban contract through the `PositionSource` interface, then stores
+  an authorized snapshot in the registry. Add/remove operations remain owner-
+  authorized and emit typed events.
+- **Inter-contract communication:** the contract test registers a source
+  contract and verifies that the registry records the value returned by that
+  contract. The frontend service layer exposes the same flow through
+  `syncPosition`.
+- **Event streaming:** `PositionsBoard` polls Soroban events using a cursor,
+  refreshes the registry snapshot when events arrive, and shows live/syncing
+  status with resilient RPC error handling.
+- **CI/CD:** `.github/workflows/ci.yml` runs frontend tests, lint, production
+  build, and Rust contract tests on pushes and pull requests.
+- **Deployment workflow:** `contracts/portfolio-tracker/deploy-testnet.sh`
+  builds the WASM and prints a secret-safe Stellar CLI deployment command.
+- **Responsive frontend:** the dashboard collapses to a single mobile column,
+  forms switch to one column on narrow screens, and loading, pending, success,
+  error, and empty states are represented in the UI.
+- **Tests:** `npm test` covers four portfolio/data-flow behaviors; the Rust
+  suite covers authorization, ordering, ownership, totals, events, and
+  inter-contract synchronization.
+- **Production architecture:** Horizon, wallet, Soroban RPC, and pure
+  portfolio selectors are separated into service modules; `ErrorBoundary`
+  protects dashboard sections and event polling keeps the last good snapshot
+  when RPC is temporarily unavailable.
+
+### Level 3 evidence to capture before submission
+
+Screenshots and a demo video should be captured from the live deployment, not
+fabricated in source control.
+
+| Evidence | Capture location |
+| --- | --- |
+| Mobile responsive UI | Browser devtools at a mobile viewport |
+| CI/CD running | GitHub Actions run for `.github/workflows/ci.yml` |
+| 3+ passing tests | Combined `npm test` and `cargo test --release` output |
+| Contract address | Deployed contract listed above |
+| Interaction transaction | `add_position` transaction listed above |
+| Demo video | Connect, fund, add position, live event, remove position |

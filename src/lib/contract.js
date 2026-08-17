@@ -52,6 +52,20 @@ export async function addPosition({ owner, asset, amount, note }, signTransactio
   }
 }
 
+export async function syncPosition(
+  { owner, source, asset, note },
+  signTransaction = signWalletTransaction,
+) {
+  const client = await getTrackerClient(owner, signTransaction)
+  const tx = await client.sync_position({ owner, source, asset, note })
+  const sent = await tx.signAndSend()
+  return {
+    result: sent.result,
+    hash: sent.sendTransactionResponse?.hash,
+    status: 'success',
+  }
+}
+
 export async function removePosition({ owner, index }, signTransaction = signWalletTransaction) {
   const client = await getTrackerClient(owner, signTransaction)
   const tx = await client.remove_position({ owner, index: BigInt(index) })

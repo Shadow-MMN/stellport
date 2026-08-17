@@ -63,6 +63,7 @@ function PositionsBoard({ address }) {
   const [status, setStatus] = useState({ state: null, hash: null, message: '' })
   const [live, setLive] = useState(false)
   const [error, setError] = useState('')
+  const [initialLoading, setInitialLoading] = useState(true)
   const [removingIdx, setRemovingIdx] = useState(null)
   const cursorRef = useRef(null)
   const timerRef = useRef(null)
@@ -79,6 +80,8 @@ function PositionsBoard({ address }) {
       setTotal(nextTotal)
     } catch (err) {
       setError(err?.message ?? 'Could not load the positions board.')
+    } finally {
+      setInitialLoading(false)
     }
   }, [address])
 
@@ -288,7 +291,12 @@ function PositionsBoard({ address }) {
 
       <div className="stack">
         <ul className="tx-list">
-          {positions.length === 0 ? (
+          {initialLoading ? (
+            <li className="tx-list__item" aria-live="polite">
+              <span className="tx-list__dir">Loading positions…</span>
+              <span className="tx-list__amount">Reading the Soroban registry.</span>
+            </li>
+          ) : positions.length === 0 ? (
             <li className="tx-list__item">
               <span className="tx-list__dir">Empty</span>
               <span className="tx-list__amount">No positions yet. Be the first!</span>
