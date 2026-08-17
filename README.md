@@ -46,7 +46,7 @@ through contract events.
 | **Fetch XLM balance & display in UI**                                                  | [`PortfolioCard.jsx`](src/components/PortfolioCard.jsx)        | [Dashboard](screenshots/every-operation.png) + [Balance](screenshots/2-balance.png) |
 | **Send an XLM transaction on testnet**                                                 | [`SendCard.jsx`](src/components/SendCard.jsx) + [`lib/stellar.js`](src/lib/stellar.js) | [On-chain tx](screenshots/3-successful-transaction.png)                   |
 | **Success / failure + transaction hash shown**                                         | [`SendCard.jsx`](src/components/SendCard.jsx)                  | [Dashboard](screenshots/every-operation.png) (result box + "View on Explorer") |
-| **10+ meaningful commits**                                                             | Repo history (12 commits)                                      | [`git log`](https://github.com/Shadow-MMN/stellport/commits/main)         |
+| **10+ meaningful commits**                                                             | Repo history (26 commits)                                      | [`git log`](https://github.com/Shadow-MMN/stellport/commits/main)         |
 
 ## Level 2 — Yellow Belt coverage
 
@@ -59,7 +59,20 @@ through contract events.
 | **Real-time contract events (write/read listeners)**                                      | [`fetchContractEvents`](src/lib/contract.js) polling `rpc.getEvents`                     | "Live events" pill in [Positions board](screenshots/level2-positions-board.png)            |
 | **Transaction status tracking**                                                           | `pollTransaction` + `StatusPill` in [PositionsBoard.jsx](src/components/PositionsBoard.jsx) | [Dashboard](screenshots/level2-connected-dashboard.png)                                   |
 | **3+ error types handled (wallet not found, rejected, insufficient balance)**             | [`classifyWalletError`](src/lib/wallet.js) (also network mismatch, timeout)              | In-app error messages (connect / send / add position flows)                               |
-| **10+ meaningful commits**                                                                | Repo history (18+ commits)                                                              | [`git log`](https://github.com/Shadow-MMN/stellport/commits/main)                         |
+| **10+ meaningful commits**                                                                | Repo history (26 commits)                                                              | [`git log`](https://github.com/Shadow-MMN/stellport/commits/main)                         |
+
+### Level 2 revision verification
+
+This submission was developed incrementally across 26 meaningful commits,
+not as a single bulk-commit dump. The history includes separate implementation
+and fix commits for the Stellar service layer, wallet integration, Soroban
+contract, contract client, positions board, event synchronization, ownership
+indexing, screenshots, and documentation. The complete public history is
+available in the [GitHub commit log](https://github.com/Shadow-MMN/stellport/commits/main).
+
+The Level 2 requirements are demonstrated by the deployed testnet contract,
+connected dashboard screenshots, multi-wallet picker screenshot, positions
+board screenshot, and on-chain transaction links documented below.
 
 ## Screenshots
 
